@@ -1,6 +1,6 @@
 
 
-######1. Descriptive Statistics ----
+######Issue 1. Descriptive Statistics ----
 ###Download sample datasets ----
 require("readr")
 library(readr)
@@ -29,8 +29,7 @@ print(housing_chas_mode)
 summary(housing)
 
 ## Measures of Relationship ----
-
-## STEP 14. Measure the covariance between variables ----
+#Measure the covariance between variables ----
 # Note that the covariance and the correlation are computed for numeric values
 # only, not categorical values.
 boston_housing_cov <- cov(housing[, -9])
@@ -59,7 +58,36 @@ str(housing)
 housing_cov <- cov(housing[, -9])
 View(housing_cov)
 
-###2. Inferential Statistics
+
+
+
+###Issue 2. Inferential Statistics
+## STEP 16. Perform ANOVA on the “California Housing” dataset ----
+
+# Dependent variable:	 median_house_value
+# Independent variables: median_income, households,total_rooms
+
+##A One-way ANOVA
+housing_one_way_anova <- aov(median_house_value ~ total_rooms, data = housing)
+summary(housing_one_way_anova)
+
+##A two-way ANOVA
+# can then be used to confirm this. Execute the following for a two-way ANOVA
+# (two independent variables):
+
+housing_additive_two_way_anova <- aov(median_house_value ~ total_rooms + median_income, # nolint
+                                           data = housing)
+summary(housing_additive_two_way_anova)
+
+housing_interactive_two_way_anova <- aov(median_house_value ~ total_rooms * median_income, # nolint
+                                              data = housing)
+summary(housing_interactive_two_way_anova)
+
+
+
+###Issue 3. BAsic Visualization
+### Univariate Plots
+
 
 
 
