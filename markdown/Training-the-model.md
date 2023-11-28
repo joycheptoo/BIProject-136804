@@ -3943,7 +3943,7 @@ install.packages(c("caret", "boot", "MASS"))
     ## package 'boot' successfully unpacked and MD5 sums checked
     ## 
     ## The downloaded binary packages are in
-    ##  C:\Users\Joy\AppData\Local\Temp\Rtmpi6Dbph\downloaded_packages
+    ##  C:\Users\Joy\AppData\Local\Temp\RtmpO6BbK5\downloaded_packages
 
 ``` r
 library(caret)
