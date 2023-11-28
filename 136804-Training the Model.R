@@ -158,82 +158,90 @@ print(predictions_lm)
 
 ######### Step 5:Model performance comparison using resampling(for classification and regression)
 # Load necessary libraries
-install.packages(c("caret", "boot", "MASS", "readr"))
+install.packages(c("caret", "boot", "MASS"))
 library(caret)
 library(boot)
 library(MASS)
-library(readr)
 
 # Load the housing dataset
-housing <- read_csv("data/housing.csv", 
-                    col_types = cols(longitude = col_double(), 
-                                     latitude = col_double(), 
-                                     housing_median_age = col_number(), 
-                                     total_rooms = col_number(), 
-                                     total_bedrooms = col_number(), 
-                                     population = col_number(), 
-                                     households = col_number(), 
-                                     median_income = col_number(), 
-                                     ocean_proximity = col_character(), 
-                                     median_house_value = col_number()))
+housing <- read_csv("data/housing.csv", col_types = cols(longitude = col_double(), 
+                                                         latitude = col_double(), 
+                                                         housing_median_age = col_number(), 
+                                                         total_rooms = col_number(), 
+                                                         total_bedrooms = col_number(), 
+                                                         population = col_number(), 
+                                                         households = col_number(), 
+                                                         median_income = col_number(), 
+                                                         ocean_proximity = col_character(), 
+                                                         median_house_value = col_number()))
 
-# Create train/test split
-train_index <- createDataPartition(housing$median_house_value, p = 0.75, list = FALSE)
-housing_train <- housing[train_index, ]
-housing_test <- housing[-train_index, ]
+# 1. Bootstrapping
+# 1a. Split the dataset
+set.seed(42)
+train_index_boot <- createDataPartition(housing$median_house_value,
+                                        p = 0.75,
+                                        list = FALSE)
+housing_train_boot <- housing[train_index_boot, ]
+housing_test_boot <- housing[-train_index_boot, ]
 
-# Linear Regression Model with Bootstrapping
-housing_model_lm_bootstrap <- caret::train(median_house_value ~ longitude + latitude + housing_median_age +
-                                             total_rooms + total_bedrooms + population + households +
-                                             median_income + ocean_proximity,
-                                           data = housing_train,
-                                           trControl = trainControl(method = "boot", number = 500),
-                                           na.action = na.omit, method = "lm", metric = "RMSE")
+# 1b. Bootstrapping train control
+housing_model_lm_boot <- caret::train(median_house_value ~ .,
+                                      data = housing_train_boot,
+                                      trControl = trainControl(method = "boot", number = 500),
+                                      na.action = na.omit, method = "lm", metric = "RMSE")
 
-# Test the trained linear regression model using the testing dataset
-predictions_lm_bootstrap <- predict(housing_model_lm_bootstrap, newdata = housing_test)
+# 3. Test the trained linear regression model using the testing dataset
+predictions_lm_boot <- predict(housing_model_lm_boot, newdata = housing_test_boot)
 
-# View the RMSE and the predicted values
-print(housing_model_lm_bootstrap)
-print(predictions_lm_bootstrap)
+# 4. View the RMSE and the predicted values for the testing dataset
+print(housing_model_lm_boot)
+print(predictions_lm_boot)
 
-# Use the model to make a prediction on unseen new data
-new_data <- data.frame(longitude = -122.3,  
-                       latitude = 37.5,     
-                       housing_median_age = 30,  
-                       total_rooms = 2000,  
-                       total_bedrooms = 400,  
-                       population = 1000,  
-                       households = 350,  
-                       median_income = 5.0,  
-                       ocean_proximity = "NEAR BAY",
-                       check.names = FALSE)
+# 5. Use the model to make a prediction on unseen new data
+new_data_boot <- data.frame(longitude = -122.3,
+                            latitude = 37.5,
+                            housing_median_age = 30,
+                            total_rooms = 2000,
+                            total_bedrooms = 400,
+                            population = 1000,
+                            households = 350,
+                            median_income = 5.0,
+                            ocean_proximity = "NEAR BAY",
+                            check.names = FALSE)
 
-# The variables that are factors (categorical) in the training dataset must
-# also be defined as factors in the new data
-new_data$ocean_proximity <- as.factor(new_data$ocean_proximity)
+new_data_boot$ocean_proximity <- as.factor(new_data_boot$ocean_proximity)
 
-# Use the model to predict the output based on the unseen new data
-predictions_lm_new_data_bootstrap <- predict(housing_model_lm_bootstrap, new_data)
+# Predictions for the unseen new data
+predictions_lm_new_data_boot <- predict(housing_model_lm_boot, new_data_boot)
 
 # Print the predictions for the dependent variable
-print(predictions_lm_new_data_bootstrap)
+print(predictions_lm_new_data_boot)
 
-# Linear Regression Model with Cross-Validation
+
+# 2. Cross-validation
+# Split the dataset
+train_index_cv <- createDataPartition(housing$median_house_value, p = 0.75, list = FALSE)
+housing_train_cv <- housing[train_index_cv, ]
+housing_test_cv <- housing[-train_index_cv, ]
+
+# Linear Regression Model with 10-fold cross-validation
 train_control_cv <- trainControl(method = "cv", number = 10)
 
 housing_model_lm_cv <- caret::train(median_house_value ~ .,
-                                    data = housing_train,
+                                    data = housing_train_cv,
                                     trControl = train_control_cv,
                                     na.action = na.omit,
                                     method = "lm",
                                     metric = "RMSE")
 
 # Test the trained model using the testing dataset
-predictions_lm_cv <- predict(housing_model_lm_cv, newdata = housing_test)
+predictions_lm_cv <- predict(housing_model_lm_cv, newdata = housing_test_cv)
 
 # View the RMSE and the predicted values
 print(housing_model_lm_cv)
 print(predictions_lm_cv)
+
+
+
 
 

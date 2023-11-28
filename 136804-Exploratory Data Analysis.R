@@ -58,9 +58,6 @@ str(housing)
 housing_cov <- cov(housing[, -9])
 View(housing_cov)
 
-
-
-
 ###Issue 2. Inferential Statistics
 ## STEP 16. Perform ANOVA on the “California Housing” dataset ----
 
