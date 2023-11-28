@@ -1,7 +1,5 @@
-#136804 Joy Cheptoo Mutai
-#Group C
-# Housing Price Prediction`
-
+# Housing Price Prediction 
+## 136804 Joy Mutai
 ## Introduction
 This project uses machine learning techniques to develop a strong model that predicts median house values in California. 
 Achievements
